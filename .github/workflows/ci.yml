@@ -11,41 +11,41 @@ jobs:
   
   steps:
 
-     - name: Checkout repository
-       uses: actions/checkout@v6
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-     - name: Build Docker image
-       run: | 
+      - name: Build Docker image
+        run: | 
            docker build -t doordash/delivery-fee-service .
       
-     - name: Run docker image
-       run: |
+      - name: Run docker image
+        run: |
            docker run -d -p 8080:8080 doordash/delivery-fee-service 
      
-     - name: Start FastAPI server
-       run: |
+      - name: Start FastAPI server
+        run: |
           uvicorn app:app --host 0.0.0.0 --port 8000 &
           sleep 3
 
-     - name: welcome
-       uses: |
+      - name: welcome
+        uses: |
            curl -f http://localhost:8000/
 
-     - name: welcome
-       uses: |
+      - name: welcome
+        uses: |
            curl -f http://localhost:8000/calculate-fee/
 
-     - name: welcome
-       uses: |
+      - name: welcome
+        uses: |
            curl -f http://localhost:8000/estimate-time/10
 
-     - name: welcome
-       uses: |
+      - name: welcome
+        uses: |
          curl -f http://localhost:8000/status/
 
-     - name: Stop and remove container
-        if:always()
-       run: |
+      - name: Stop and remove container
+        if: always()
+        run: |
           docker stop doordash/delivery-fee-service 
           docker rm doordash/delivery-fee-service 
           docker ps -a
