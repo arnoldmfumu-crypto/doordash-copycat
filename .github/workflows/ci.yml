@@ -16,11 +16,14 @@ jobs:
 
       - name: Build Docker image
         run: | 
-           docker build -t doordash/delivery-fee-service .
+           docker build -t doordash-fee-service .
       
       - name: Run docker image
         run: |
-           docker run -d -p 8080:8080 doordash/delivery-fee-service 
+           docker run -d \
+            -p 8080:8080 \
+            --name fee-service \
+            doordash-fee-service 
      
       - name: Start FastAPI server
         run: |
