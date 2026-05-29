@@ -1,56 +1,49 @@
 name: arnold first workflow
+
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
-  build and test:
+  build-and-test:
     runs-on: ubuntu-latest
-  
-  steps:
 
+    steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: | 
-           docker build -t doordash-fee-service .
-      
-      - name: Run docker image
-        run: |
-           docker run -d \
-            -p 8080:8080 \
-            --name fee-service \
-            doordash-fee-service 
-     
+        run: docker build -t doordash/delivery-fee-service .
+
+      - name: Run Docker image
+        run: docker run -d -p 8080:8080 doordash/delivery-fee-service
+
       - name: Start FastAPI server
         run: |
           uvicorn app:app --host 0.0.0.0 --port 8000 &
           sleep 3
 
-      - name: welcome
-        uses: |
-           curl -f http://localhost:8000/
+      - name: Test GET /
+        run: curl -f http://localhost:8000/
 
-      - name: welcome
-        uses: |
-           curl -f http://localhost:8000/calculate-fee/
+      - name: Test POST /calculate-fee/
+        run: curl -f -X POST http://localhost:8000/calculate-fee/
+              -H "Content-Type: application/json"
+              -d '{"distance_km": 5.0, "weight_kg": 2.0}'
 
-      - name: welcome
-        uses: |
-           curl -f http://localhost:8000/estimate-time/10
+      - name: Test GET /estimate-time/
+        run: curl -f http://localhost:8000/estimate-time/10
 
-      - name: welcome
-        uses: |
-         curl -f http://localhost:8000/status/
+      - name: Test GET /status/
+        run: curl -f http://localhost:8000/status/
 
       - name: Stop and remove container
         if: always()
         run: |
-          docker stop doordash/delivery-fee-service 
-          docker rm doordash/delivery-fee-service 
+          docker stop doordash/delivery-fee-service
+          docker rm doordash/delivery-fee-service
           docker ps -a
 
 
